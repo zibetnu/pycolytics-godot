@@ -79,10 +79,12 @@ func _sync_project_settings() -> void:
 		)
 	else:
 		PycoEvent.default_event.api_key = _Plugin.DEFAULT_API_KEY
-	if ProjectSettings.has_setting(&"addons/pycolytics/server_url"):
-		url = (
-			ProjectSettings.get_setting_with_override(&"addons/pycolytics/server_url") + _url_suffix
+
+	if ProjectSettings.has_setting(_Plugin.SERVER_URL_SETTING):
+		var base_url: String = ProjectSettings.get_setting_with_override(
+			_Plugin.SERVER_URL_SETTING
 		)
+		url = base_url.path_join(_url_suffix)
 
 
 func _get_startup_event() -> PycoEvent:
