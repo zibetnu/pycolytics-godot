@@ -45,14 +45,18 @@ func _process(_delta: float) -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_CLOSE_REQUEST:
-		if _http_request.is_requesting:
-			await _http_request.request_finished
+	if what == NOTIFICATION_WM_CLOSE_REQUEST and !_shutdown_initiated:
 		if not shutdown_callable.is_null():
 			log_event(shutdown_callable.call())
 		_shutdown_initiated = true
+
+		# Await possible previous messages
+		if _http_request.is_requesting:
+			await _http_request.request_finished
 		_flush_queue()
-		await _http_request.request_finished
+		# Await shutdown message
+		if _http_request.is_requesting:
+			await _http_request.request_finished
 		shutdown_event_sent.emit()
 
 
